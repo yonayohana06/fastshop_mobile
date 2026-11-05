@@ -1,0 +1,24 @@
+{
+  "name": "PROD - E-Commerce Env",
+  "variables": [
+    {
+      "name": "baseUrl",
+      "value": "https://ecommerce-backend-api-nu.vercel.app/api/",
+      "type": "text",
+      "enabled": true,
+      "secret": false
+    },
+    {
+      "name": "jwt_token",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc5MjE3MDE0MSwiZXhwIjoxNzkyMjU2NTQxfQ.CaS2-MeyQ2jt0dtgSUeLkUq20F4CyRn9V4LfJ95arbQ",
+      "type": "text",
+      "enabled": true,
+      "secret": false
+    }
+  ],
+  "info": {
+    "type": "bruno-environment",
+    "exportedAt": "2026-10-16T17:54:51.514Z",
+    "exportedUsing": "Bruno/v4.2.1"
+  }
+}

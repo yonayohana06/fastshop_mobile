@@ -1,0 +1,582 @@
+{
+  "info": {
+    "name": "E-Commerce API Documentation",
+    "description": null,
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "description": "",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}auth/login",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}auth"
+              ],
+              "path": [
+                "login"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"agussumanto@example.com\",\n    \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    // Sesuaikan 'data.token' atau 'token' sesuai struktur JSON dari backend kamu",
+                  "    pm.environment.set(\"jwt_token\", jsonData.data.token); ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}auth/register",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}auth"
+              ],
+              "path": [
+                "register"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Nayla Putri\",\n    \"email\": \"naylaputri@example.com\",\n    \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}auth/me",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}auth"
+              ],
+              "path": [
+                "me"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}cart",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}cart"
+              ],
+              "path": [],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Add Item Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}cart",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}cart"
+              ],
+              "path": [],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": 12,\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Edit Item Cart",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}cart/:cartId",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}cart"
+              ],
+              "path": [
+                ":cartId"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "cartId",
+                  "value": "12"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Item Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}cart/:cartId1",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}cart"
+              ],
+              "path": [
+                ":cartId1"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "cartId1",
+                  "value": "12"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete All Item Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}cart",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}cart"
+              ],
+              "path": [],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}categories?search=elektronik",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}categories?search=elektronik"
+              ],
+              "path": [],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "elektronik"
+                }
+              ],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Category Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}categories/:catId",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}categories"
+              ],
+              "path": [
+                ":catId"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "catId",
+                  "value": "2"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Checkout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}orders/checkout",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}orders"
+              ],
+              "path": [
+                "checkout"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shipping_address\": \"Jl. Godean KM 5, Yogyakarta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Upload Proof of Pay",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}orders/:orderId/pay",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}orders"
+              ],
+              "path": [
+                ":orderId",
+                "pay"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "4"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "proof_image",
+                  "disabled": false,
+                  "type": "file",
+                  "description": "",
+                  "src": "/Users/mmm/Documents/Screenshot/Screenshot 2026-09-09 at 9.21.41 PM.png"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Order",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}orders?status=&page=1&limit=10",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}orders?status=&page=1&limit=10"
+              ],
+              "path": [],
+              "query": [
+                {
+                  "key": "status",
+                  "value": ""
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Order Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}orders/:orderId",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}orders"
+              ],
+              "path": [
+                ":orderId"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "4"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Product",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}products?search=&category_id=&page=1&limit=15",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}products?search=&category_id=&page=1&limit=15"
+              ],
+              "path": [],
+              "query": [
+                {
+                  "key": "search",
+                  "value": ""
+                },
+                {
+                  "key": "category_id",
+                  "value": ""
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "15"
+                }
+              ],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Product Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "",
+            "url": {
+              "raw": "{{baseUrl}}products/:productId",
+              "protocol": "",
+              "host": [
+                "{{baseUrl}}products"
+              ],
+              "path": [
+                ":productId"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "productId",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
