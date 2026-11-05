@@ -62,7 +62,7 @@ Silakan edit struktur field dan tipe data di bawah ini sesuai dengan response ba
 - **Response 201 (Created):**
   ```json
   {
-    "success": true,
+    "code": 201,
     "message": "Registrasi berhasil",
     "data": {
       "id": 2,
@@ -75,7 +75,7 @@ Silakan edit struktur field dan tipe data di bawah ini sesuai dengan response ba
 - **Response 400 (Bad Request):**
   ```json
   {
-    "success": false,
+    "code": 400,
     "message": "Email sudah terdaftar"
   }
   ```

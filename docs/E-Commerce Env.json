@@ -10,7 +10,7 @@
     },
     {
       "name": "jwt_token",
-      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc5MjE3MDE0MSwiZXhwIjoxNzkyMjU2NTQxfQ.CaS2-MeyQ2jt0dtgSUeLkUq20F4CyRn9V4LfJ95arbQ",
+      "value": "",
       "type": "text",
       "enabled": true,
       "secret": false
