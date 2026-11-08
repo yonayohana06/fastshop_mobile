@@ -3,9 +3,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/design_system/design_system.dart';
 
-/// Kerangka root setelah login: bottom navigation + tab yang dijaga
-/// state-nya oleh [StatefulNavigationShell] (scroll & filter tidak hilang
-/// saat pindah tab).
+/// Kerangka root: bottom navigation 4 tab + state tiap tab dijaga oleh
+/// [StatefulNavigationShell] (scroll & filter tidak hilang saat pindah tab).
+///
+/// Keranjang tidak ada di sini; aksesnya lewat ikon di header Beranda.
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key, required this.navigationShell});
 
@@ -19,14 +20,14 @@ class DashboardPage extends StatelessWidget {
       selectedIcon: Icons.home,
     ),
     AppNavItem(
-      label: 'Keranjang',
-      icon: Icons.shopping_cart_outlined,
-      selectedIcon: Icons.shopping_cart,
-    ),
-    AppNavItem(
       label: 'Pesanan',
       icon: Icons.receipt_long_outlined,
       selectedIcon: Icons.receipt_long,
+    ),
+    AppNavItem(
+      label: 'Notifikasi',
+      icon: Icons.notifications_outlined,
+      selectedIcon: Icons.notifications,
     ),
     AppNavItem(
       label: 'Profil',

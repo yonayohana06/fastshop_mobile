@@ -6,7 +6,7 @@ import '../tokens/app_spacing.dart';
 import 'app_button.dart';
 
 /// Tampilan kosong/error (keranjang kosong, hasil tidak ditemukan,
-/// koneksi putus) dengan aksi opsional.
+/// koneksi putus, perlu login) dengan satu atau dua aksi opsional.
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,
@@ -15,6 +15,8 @@ class EmptyState extends StatelessWidget {
     this.message,
     this.actionLabel,
     this.onAction,
+    this.secondaryActionLabel,
+    this.onSecondaryAction,
   });
 
   final IconData icon;
@@ -23,15 +25,20 @@ class EmptyState extends StatelessWidget {
   final String? actionLabel;
   final VoidCallback? onAction;
 
+  /// Aksi kedua yang lebih ringan (tombol teks), mis. "Belum punya akun? Daftar".
+  final String? secondaryActionLabel;
+  final VoidCallback? onSecondaryAction;
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colors = context.appColors;
     final description = message;
     final label = actionLabel;
+    final secondaryLabel = secondaryActionLabel;
 
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -66,6 +73,16 @@ class EmptyState extends StatelessWidget {
               AppButton(
                 label: label,
                 onPressed: onAction,
+                expanded: false,
+                size: AppButtonSize.small,
+              ),
+            ],
+            if (secondaryLabel != null && onSecondaryAction != null) ...[
+              const SizedBox(height: AppSpacing.xs),
+              AppButton(
+                label: secondaryLabel,
+                onPressed: onSecondaryAction,
+                variant: AppButtonVariant.text,
                 expanded: false,
                 size: AppButtonSize.small,
               ),

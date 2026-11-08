@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/error/failures.dart';
 import '../entities/product_category.dart';
+import '../entities/product_detail.dart';
 import '../entities/product_page.dart';
 
 abstract class ProductRepository {
@@ -13,6 +14,8 @@ abstract class ProductRepository {
     String? query,
     int? categoryId,
   });
+
+  Future<Either<Failure, ProductDetail>> getProductDetail(String id);
 
   Future<Either<Failure, List<ProductCategory>>> getCategories();
 }

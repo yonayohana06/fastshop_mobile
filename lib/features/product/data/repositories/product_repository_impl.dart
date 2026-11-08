@@ -4,6 +4,7 @@ import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/network_info.dart';
 import '../../domain/entities/product_category.dart';
+import '../../domain/entities/product_detail.dart';
 import '../../domain/entities/product_page.dart';
 import '../../domain/repositories/product_repository.dart';
 import '../datasources/product_remote_data_source.dart';
@@ -35,6 +36,13 @@ class ProductRepositoryImpl implements ProductRepository {
         categoryId: categoryId,
       ),
     );
+  }
+
+  @override
+  Future<Either<Failure, ProductDetail>> getProductDetail(String id) async {
+    if (!await _network.isConnected) return const Left(NetworkFailure());
+
+    return guardFailure<ProductDetail>(() => _remote.getProductDetail(id));
   }
 
   @override

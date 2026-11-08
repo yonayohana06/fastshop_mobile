@@ -75,7 +75,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ApiEndpoints.me,
         options: Options(
           extra: _noSessionRedirect,
-          // Dipanggil saat app start; jangan menahan splash terlalu lama.
+          // Dipanggil saat app start (berjalan di latar belakang, dashboard
+          // sudah tampil); batasi supaya tidak menggantung di jaringan lambat.
           receiveTimeout: const Duration(seconds: 8),
         ),
       );

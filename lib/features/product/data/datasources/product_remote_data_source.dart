@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_guard.dart';
 import '../models/product_category_model.dart';
+import '../models/product_detail_model.dart';
 import '../models/product_page_model.dart';
 
 abstract class ProductRemoteDataSource {
@@ -12,6 +13,9 @@ abstract class ProductRemoteDataSource {
     String? query,
     int? categoryId,
   });
+
+  /// `GET /products/:id`
+  Future<ProductDetailModel> getProductDetail(String id);
 
   Future<List<ProductCategoryModel>> getCategories();
 }
@@ -40,6 +44,18 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
         },
       );
       return ProductPageModel.fromJson(response.data!);
+    });
+  }
+
+  @override
+  Future<ProductDetailModel> getProductDetail(String id) {
+    return guardDio(() async {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '${ApiEndpoints.products}/${Uri.encodeComponent(id)}',
+      );
+      return ProductDetailModel.fromJson(
+        response.data!['data'] as Map<String, dynamic>,
+      );
     });
   }
 

@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/design_system/design_system.dart';
 import '../../../../core/di/injection.dart';
-import '../../../auth/presentation/bloc/auth/auth_bloc.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../product/presentation/bloc/category_list/category_list_bloc.dart';
 import '../../../product/presentation/bloc/product_list/product_list_bloc.dart';
-import '../../../product/presentation/widgets/category_chip_list.dart';
+import '../../../product/presentation/widgets/category_icon_list.dart';
 import '../../../product/presentation/widgets/product_grid_sliver.dart';
+import '../../../product/presentation/widgets/product_list_scroll_trigger.dart';
+import '../widgets/home_header.dart';
+import '../widgets/promo_banner_carousel.dart';
 
-/// Tab Beranda: sapaan, pencarian, filter kategori, dan kumpulan produk.
+/// Tab Beranda. Dapat dilihat tanpa login. Urutan (atas ke bawah):
+/// header + pencarian (sticky) → banner promo → kategori → produk.
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -38,37 +43,25 @@ class _HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<_HomeView> {
-  final _scrollController = ScrollController();
   final _searchController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
   void dispose() {
-    _scrollController
-      ..removeListener(_onScroll)
-      ..dispose();
     _searchController.dispose();
     super.dispose();
   }
 
-  /// Infinite scroll: minta halaman berikutnya saat mendekati dasar daftar.
-  void _onScroll() {
-    if (!_scrollController.hasClients) return;
+  /// Pengguna menekan "cari" di keyboard → buka halaman hasil pencarian.
+  Future<void> _onSearchSubmitted(String value) async {
+    final query = value.trim();
+    if (query.isEmpty) return;
 
-    final bloc = context.read<ProductListBloc>();
-    // Setelah gagal, halaman berikutnya hanya dimuat lewat tombol "coba lagi"
-    // supaya scroll di dasar daftar tidak memicu permintaan berulang.
-    if (bloc.state.hasReachedMax || bloc.state.loadMoreFailed) return;
+    FocusScope.of(context).unfocus();
+    await context.push<void>(AppRoutes.searchPath(query));
 
-    final position = _scrollController.position;
-    if (position.pixels >= position.maxScrollExtent - 400) {
-      bloc.add(const ProductListNextPageRequested());
-    }
+    // Kembali dari halaman hasil: kosongkan kolom supaya Beranda tidak
+    // terlihat seolah sedang difilter.
+    if (mounted) _searchController.clear();
   }
 
   Future<void> _onRefresh() async {
@@ -83,13 +76,6 @@ class _HomeViewState extends State<_HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colors = context.appColors;
-    final fullName = context.select<AuthBloc, String?>(
-      (bloc) => bloc.state.user?.name,
-    );
-    final firstName = fullName?.trim().split(' ').first;
-
     return BlocListener<ProductListBloc, ProductListState>(
       // Gagal memuat ulang saat daftar sudah terisi: cukup beri tahu.
       listenWhen: (previous, current) =>
@@ -106,49 +92,27 @@ class _HomeViewState extends State<_HomeView> {
           );
       },
       child: Scaffold(
-        body: SafeArea(
+        body: ProductListScrollTrigger(
           child: RefreshIndicator(
             onRefresh: _onRefresh,
             child: CustomScrollView(
-              controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
               keyboardDismissBehavior:
                   ScrollViewKeyboardDismissBehavior.onDrag,
               slivers: [
-                SliverToBoxAdapter(
+                HomeHeaderSliver(
+                  searchController: _searchController,
+                  onSearchSubmitted: _onSearchSubmitted,
+                ),
+                const SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          firstName == null || firstName.isEmpty
-                              ? 'Halo!'
-                              : 'Halo, $firstName',
-                          style: textTheme.headlineSmall,
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          'Mau belanja apa hari ini?',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colors.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        AppSearchField(
-                          controller: _searchController,
-                          onChanged: (query) => context
-                              .read<ProductListBloc>()
-                              .add(ProductListSearchChanged(query)),
-                        ),
-                      ],
-                    ),
+                    padding: EdgeInsets.only(top: AppSpacing.lg),
+                    child: PromoBannerCarousel(),
                   ),
                 ),
-                const SliverToBoxAdapter(child: CategoryChipList()),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: AppSpacing.lg),
-                ),
+                const SliverToBoxAdapter(child: _SectionTitle('Kategori')),
+                const SliverToBoxAdapter(child: CategoryIconList()),
+                const SliverToBoxAdapter(child: _SectionTitle('Produk Pilihan')),
                 const ProductGridSliver(),
                 const ProductListFooterSliver(),
               ],
@@ -156,6 +120,25 @@ class _HomeViewState extends State<_HomeView> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.title);
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.xl,
+        AppSpacing.lg,
+        AppSpacing.md,
+      ),
+      child: Text(title, style: Theme.of(context).textTheme.titleMedium),
     );
   }
 }

@@ -22,9 +22,9 @@ final class ProductListRefreshed extends ProductListReloadEvent {
   const ProductListRefreshed();
 }
 
-/// Kata kunci pencarian berubah (di-debounce di bloc).
-final class ProductListSearchChanged extends ProductListReloadEvent {
-  const ProductListSearchChanged(this.query);
+/// Pengguna mengirim pencarian (menekan "cari" di keyboard).
+final class ProductListQueryChanged extends ProductListReloadEvent {
+  const ProductListQueryChanged(this.query);
 
   final String query;
 

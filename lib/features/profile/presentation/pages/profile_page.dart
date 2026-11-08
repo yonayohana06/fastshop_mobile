@@ -4,10 +4,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/design_system/design_system.dart';
 import '../../../auth/domain/entities/user.dart';
 import '../../../auth/presentation/bloc/auth/auth_bloc.dart';
+import '../../../auth/presentation/widgets/auth_required.dart';
 
 /// Tab Profil (sementara): data akun dan tombol keluar.
+/// Tamu melihat ajakan masuk/daftar.
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const AuthRequired(
+      title: 'Profil',
+      icon: Icons.person_outline,
+      guestMessage: 'Masuk untuk melihat profil dan mengelola akunmu.',
+      child: _ProfileView(),
+    );
+  }
+}
+
+class _ProfileView extends StatelessWidget {
+  const _ProfileView();
 
   @override
   Widget build(BuildContext context) {

@@ -12,19 +12,26 @@ import '../bloc/auth/auth_bloc.dart';
 import '../bloc/login/login_bloc.dart';
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+  const LoginPage({super.key, this.returnToPrevious = false});
+
+  /// `true` jika halaman ini dibuka dari halaman lain (tamu menekan aksi yang
+  /// butuh login): setelah berhasil masuk, kembali ke halaman sebelumnya
+  /// alih-alih ke beranda.
+  final bool returnToPrevious;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => sl<LoginBloc>(),
-      child: const _LoginView(),
+      child: _LoginView(returnToPrevious: returnToPrevious),
     );
   }
 }
 
 class _LoginView extends StatefulWidget {
-  const _LoginView();
+  const _LoginView({required this.returnToPrevious});
+
+  final bool returnToPrevious;
 
   @override
   State<_LoginView> createState() => _LoginViewState();
@@ -57,24 +64,51 @@ class _LoginViewState extends State<_LoginView> {
     final textTheme = Theme.of(context).textTheme;
     final colors = context.appColors;
 
-    return BlocListener<LoginBloc, LoginState>(
-      listenWhen: (previous, current) => previous.status != current.status,
-      listener: (context, state) {
-        switch (state.status) {
-          case SubmissionStatus.success:
-            context.read<AuthBloc>().add(AuthUserAuthenticated(state.user!));
-          case SubmissionStatus.failure:
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(content: Text(state.errorMessage ?? 'Login gagal')),
-              );
-          case SubmissionStatus.initial:
-          case SubmissionStatus.loading:
-            break;
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<LoginBloc, LoginState>(
+          listenWhen: (previous, current) => previous.status != current.status,
+          listener: (context, state) {
+            switch (state.status) {
+              case SubmissionStatus.success:
+                context
+                    .read<AuthBloc>()
+                    .add(AuthUserAuthenticated(state.user!));
+              case SubmissionStatus.failure:
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text(state.errorMessage ?? 'Login gagal'),
+                    ),
+                  );
+              case SubmissionStatus.initial:
+              case SubmissionStatus.loading:
+                break;
+            }
+          },
+        ),
+        // Mode "kembali": router tidak mengalihkan ke beranda (lihat
+        // `createRouter`), jadi halaman ini yang menutup dirinya.
+        BlocListener<AuthBloc, AuthState>(
+          listenWhen: (previous, current) =>
+              previous.status != current.status &&
+              current.status == AuthStatus.authenticated,
+          listener: (context, state) {
+            if (!widget.returnToPrevious) return;
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppRoutes.home);
+            }
+          },
+        ),
+      ],
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          scrolledUnderElevation: 0,
+        ),
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(

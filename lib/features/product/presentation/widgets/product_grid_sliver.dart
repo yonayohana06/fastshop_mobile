@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/design_system/design_system.dart';
+import '../../../../core/router/app_routes.dart';
 import '../bloc/product_list/product_list_bloc.dart';
 
 /// Isi daftar produk sebagai sliver: loading, error, kosong, atau grid 2 kolom.
@@ -80,6 +82,9 @@ class ProductGridSliver extends StatelessWidget {
                     imageUrl: product.imageUrl,
                     subtitle: product.categoryName,
                     soldOut: product.isOutOfStock,
+                    onTap: () => context.push(
+                      AppRoutes.productDetailPath(product.id),
+                    ),
                   );
                 },
               );

@@ -7,7 +7,6 @@ import '../../../../core/di/injection.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/utils/submission_status.dart';
 import '../../../../core/utils/validators.dart';
-import '../bloc/auth/auth_bloc.dart';
 import '../bloc/register/register_bloc.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -66,7 +65,15 @@ class _RegisterViewState extends State<_RegisterView> {
       listener: (context, state) {
         switch (state.status) {
           case SubmissionStatus.success:
-            context.read<AuthBloc>().add(AuthUserAuthenticated(state.user!));
+            // Backend tidak mengirim token saat registrasi: arahkan ke login.
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(
+                  content: Text('Pendaftaran berhasil, silakan masuk.'),
+                ),
+              );
+            context.go(AppRoutes.login);
           case SubmissionStatus.failure:
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
@@ -81,6 +88,10 @@ class _RegisterViewState extends State<_RegisterView> {
         }
       },
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          scrolledUnderElevation: 0,
+        ),
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(

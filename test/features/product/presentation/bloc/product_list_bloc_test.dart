@@ -52,6 +52,10 @@ void main() {
 
   ProductListBloc buildBloc() => ProductListBloc(getProducts: getProducts);
 
+  test('ukuran halaman 10 produk', () {
+    expect(ProductListBloc.pageSize, 10);
+  });
+
   group('ProductListStarted', () {
     blocTest<ProductListBloc, ProductListState>(
       'emit [loading, success] saat halaman pertama berhasil dimuat',
@@ -70,7 +74,7 @@ void main() {
         ),
       ],
       verify: (_) =>
-          verify(() => getProducts(const GetProductsParams(page: 1, limit: 15)))
+          verify(() => getProducts(const GetProductsParams(page: 1, limit: 10)))
               .called(1),
     );
 
@@ -122,7 +126,7 @@ void main() {
         ),
       ],
       verify: (_) =>
-          verify(() => getProducts(const GetProductsParams(page: 2, limit: 15)))
+          verify(() => getProducts(const GetProductsParams(page: 2, limit: 10)))
               .called(1),
     );
 
@@ -193,25 +197,22 @@ void main() {
       ],
       verify: (_) => verify(
         () => getProducts(
-          const GetProductsParams(page: 1, limit: 15, categoryId: 11),
+          const GetProductsParams(page: 1, limit: 10, categoryId: 11),
         ),
       ).called(1),
     );
   });
 
-  group('ProductListSearchChanged', () {
+  group('ProductListQueryChanged (cari dikirim dari keyboard)', () {
     blocTest<ProductListBloc, ProductListState>(
-      'hanya memanggil API sekali untuk beberapa ketikan beruntun (debounce)',
+      'langsung memuat halaman 1 dengan kata kunci, tanpa debounce',
       build: () {
         when(() => getProducts(any()))
             .thenAnswer((_) async => const Right(tPage1));
         return buildBloc();
       },
-      act: (bloc) => bloc
-        ..add(const ProductListSearchChanged('s'))
-        ..add(const ProductListSearchChanged('se'))
-        ..add(const ProductListSearchChanged('sepatu')),
-      wait: const Duration(milliseconds: 700),
+      act: (bloc) => bloc.add(const ProductListQueryChanged('sepatu')),
+      // Tanpa `wait`: hasilnya harus sudah keluar sebelum ada penundaan.
       expect: () => const [
         ProductListState(
           status: ProductListStatus.loading,
@@ -224,14 +225,80 @@ void main() {
           page: 1,
         ),
       ],
-      verify: (_) {
-        verify(() => getProducts(any())).called(1);
-        verify(
-          () => getProducts(
-            const GetProductsParams(page: 1, limit: 15, query: 'sepatu'),
-          ),
-        ).called(1);
+      verify: (_) => verify(
+        () => getProducts(
+          const GetProductsParams(page: 1, limit: 10, query: 'sepatu'),
+        ),
+      ).called(1),
+    );
+
+    blocTest<ProductListBloc, ProductListState>(
+      'memangkas spasi di awal dan akhir kata kunci',
+      build: () {
+        when(() => getProducts(any()))
+            .thenAnswer((_) async => const Right(tPage1));
+        return buildBloc();
       },
+      act: (bloc) => bloc.add(const ProductListQueryChanged('  sepatu  ')),
+      verify: (_) => verify(
+        () => getProducts(
+          const GetProductsParams(page: 1, limit: 10, query: 'sepatu'),
+        ),
+      ).called(1),
+    );
+
+    blocTest<ProductListBloc, ProductListState>(
+      'mengabaikan kata kunci yang sama saat hasil sudah berhasil dimuat',
+      build: buildBloc,
+      seed: () => const ProductListState(
+        status: ProductListStatus.success,
+        products: [tProduct],
+        filter: ProductFilter(query: 'sepatu'),
+        page: 1,
+      ),
+      act: (bloc) => bloc.add(const ProductListQueryChanged('sepatu')),
+      expect: () => const <ProductListState>[],
+      verify: (_) => verifyNever(() => getProducts(any())),
+    );
+
+    blocTest<ProductListBloc, ProductListState>(
+      'mengulang pencarian yang sama jika sebelumnya gagal',
+      build: () {
+        when(() => getProducts(any()))
+            .thenAnswer((_) async => const Right(tPage1));
+        return buildBloc();
+      },
+      seed: () => const ProductListState(
+        status: ProductListStatus.failure,
+        filter: ProductFilter(query: 'sepatu'),
+        errorMessage: 'Terjadi kesalahan',
+      ),
+      act: (bloc) => bloc.add(const ProductListQueryChanged('sepatu')),
+      verify: (_) => verify(() => getProducts(any())).called(1),
+    );
+
+    blocTest<ProductListBloc, ProductListState>(
+      'mempertahankan kategori yang sedang dipilih saat kata kunci berubah',
+      build: () {
+        when(() => getProducts(any()))
+            .thenAnswer((_) async => const Right(tPage1));
+        return buildBloc();
+      },
+      seed: () => const ProductListState(
+        status: ProductListStatus.success,
+        filter: ProductFilter(categoryId: 11),
+      ),
+      act: (bloc) => bloc.add(const ProductListQueryChanged('jeans')),
+      verify: (_) => verify(
+        () => getProducts(
+          const GetProductsParams(
+            page: 1,
+            limit: 10,
+            query: 'jeans',
+            categoryId: 11,
+          ),
+        ),
+      ).called(1),
     );
   });
 }
