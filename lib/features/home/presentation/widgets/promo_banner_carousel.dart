@@ -36,7 +36,11 @@ class _PromoBannerCarouselState extends State<PromoBannerCarousel> {
 
   void _advance() {
     // Tab Beranda yang sedang tidak tampil (IndexedStack) tidak perlu beranimasi.
-    if (!mounted || !_controller.hasClients || !TickerMode.of(context)) return;
+    if (!mounted ||
+        !_controller.hasClients ||
+        !TickerMode.valuesOf(context).enabled) {
+      return;
+    }
 
     final next = (_index + 1) % widget.banners.length;
     _controller.animateToPage(

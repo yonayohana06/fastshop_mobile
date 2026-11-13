@@ -212,7 +212,7 @@ Katalog visual semua komponen ada di rute `/design-system` (hanya mode debug), t
 
 **Halaman butuh login (tamu):** `EmptyState` dengan tombol Masuk dan Daftar.
 
-**Status data:** loading (spinner/placeholder), error (`EmptyState` dengan "Coba lagi"), kosong (`EmptyState`), memuat halaman berikutnya (footer spinner; jika gagal, tombol "coba lagi").
+**Status data:** loading (skeleton kartu produk di Beranda/Pencarian dan skeleton detail produk; spinner di layar lain), error (`EmptyState` dengan "Coba lagi"), kosong (`EmptyState`), memuat halaman berikutnya (footer spinner; jika gagal, tombol "coba lagi").
 
 ## 11. Belum ada / rencana
 

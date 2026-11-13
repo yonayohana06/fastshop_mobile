@@ -8,6 +8,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../auth/presentation/widgets/auth_required.dart';
 import '../../domain/entities/product_detail.dart';
 import '../bloc/product_detail/product_detail_bloc.dart';
+import '../widgets/product_detail_skeleton.dart';
 
 /// Detail produk: gambar, harga, nama, kategori, stok, dan deskripsi,
 /// dengan bar aksi (Keranjang / Beli Sekarang) di bawah.
@@ -55,7 +56,7 @@ class _ProductDetailView extends StatelessWidget {
           switch (state.status) {
             case ProductDetailStatus.initial:
             case ProductDetailStatus.loading:
-              return const Center(child: CircularProgressIndicator());
+              return const ProductDetailSkeleton();
             case ProductDetailStatus.failure:
               return EmptyState(
                 icon: Icons.cloud_off_outlined,

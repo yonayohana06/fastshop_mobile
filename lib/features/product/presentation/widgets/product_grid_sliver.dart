@@ -5,12 +5,28 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/design_system/design_system.dart';
 import '../../../../core/router/app_routes.dart';
 import '../bloc/product_list/product_list_bloc.dart';
+import 'product_card_skeleton.dart';
 
-/// Isi daftar produk sebagai sliver: loading, error, kosong, atau grid 2 kolom.
+const _gridSpacing = AppSpacing.md;
+const _skeletonItemCount = 6;
+
+/// Tinggi sel dihitung dari lebar kartu: kotak gambar persegi + blok teks
+/// (kategori, 2 baris nama, harga) yang ikut membesar mengikuti pengaturan
+/// ukuran teks perangkat.
+double _gridItemExtent(BuildContext context, double crossAxisExtent) {
+  final itemWidth = (crossAxisExtent - _gridSpacing) / 2;
+  final textScale = MediaQuery.textScalerOf(context)
+      .scale(1)
+      .clamp(1.0, 1.6)
+      .toDouble();
+
+  return itemWidth + 80 * textScale + 24;
+}
+
+/// Isi daftar produk sebagai sliver: skeleton saat loading, error, kosong,
+/// atau grid 2 kolom.
 class ProductGridSliver extends StatelessWidget {
   const ProductGridSliver({super.key});
-
-  static const _spacing = AppSpacing.md;
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +41,7 @@ class ProductGridSliver extends StatelessWidget {
           return switch (state.status) {
             ProductListStatus.initial ||
             ProductListStatus.loading =>
-              const SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(child: CircularProgressIndicator()),
-              ),
+              const _ProductGridSkeletonSliver(),
             ProductListStatus.failure => SliverFillRemaining(
                 hasScrollBody: false,
                 child: EmptyState(
@@ -56,21 +69,15 @@ class ProductGridSliver extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           sliver: SliverLayoutBuilder(
             builder: (context, constraints) {
-              // Tinggi sel dihitung dari lebar kartu: kotak gambar persegi
-              // + blok teks (kategori, 2 baris nama, harga) yang ikut
-              // membesar mengikuti pengaturan ukuran teks perangkat.
-              final itemWidth = (constraints.crossAxisExtent - _spacing) / 2;
-              final textScale = MediaQuery.textScalerOf(context)
-                  .scale(1)
-                  .clamp(1.0, 1.6)
-                  .toDouble();
-
               return SliverGrid.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  mainAxisSpacing: _spacing,
-                  crossAxisSpacing: _spacing,
-                  mainAxisExtent: itemWidth + 80 * textScale + 24,
+                  mainAxisSpacing: _gridSpacing,
+                  crossAxisSpacing: _gridSpacing,
+                  mainAxisExtent: _gridItemExtent(
+                    context,
+                    constraints.crossAxisExtent,
+                  ),
                 ),
                 itemCount: products.length,
                 itemBuilder: (context, index) {
@@ -92,6 +99,35 @@ class ProductGridSliver extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// Grid placeholder saat halaman pertama produk sedang dimuat.
+class _ProductGridSkeletonSliver extends StatelessWidget {
+  const _ProductGridSkeletonSliver();
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      sliver: SliverLayoutBuilder(
+        builder: (context, constraints) {
+          return SliverGrid.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: _gridSpacing,
+              crossAxisSpacing: _gridSpacing,
+              mainAxisExtent: _gridItemExtent(
+                context,
+                constraints.crossAxisExtent,
+              ),
+            ),
+            itemCount: _skeletonItemCount,
+            itemBuilder: (context, index) => const ProductCardSkeleton(),
+          );
+        },
+      ),
     );
   }
 }
